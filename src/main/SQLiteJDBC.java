@@ -43,8 +43,6 @@ public class SQLiteJDBC {
 			System.err.println("Something was wrong");
 			System.exit(0);
 		}
-		// System.out.println("Opened database successfully");
-
 	}
 
 	public static void createTable(int year) {
@@ -53,7 +51,6 @@ public class SQLiteJDBC {
 		try {
 			Class.forName("org.sqlite.JDBC");
 			c = DriverManager.getConnection("jdbc:sqlite:test.db");
-			// System.out.println("Opened database successfully");
 
 			stmt = c.createStatement();
 			String sql = "CREATE TABLE RESULTS" + year + " (DATE TEXT      NOT NULL,"
@@ -67,7 +64,6 @@ public class SQLiteJDBC {
 			System.err.println("Something was wrong");
 			System.exit(0);
 		}
-		// System.out.println("Table created successfully");
 	}
 
 	// insert Fixture entry into DB
@@ -78,8 +74,7 @@ public class SQLiteJDBC {
 			Class.forName("org.sqlite.JDBC");
 			c = DriverManager.getConnection("jdbc:sqlite:test.db");
 			c.setAutoCommit(false);
-			// System.out.println("Opened database successfully");
-
+			
 			stmt = c.createStatement();
 			String sql = "INSERT INTO " + tableName
 					+ " (DATE,HOMETEAMNAME,AWAYTEAMNAME,HOMEGOALS,AWAYGOALS,COMPETITION,MATCHDAY)" + "VALUES ("
@@ -102,399 +97,8 @@ public class SQLiteJDBC {
 				c.close();
 			} catch (SQLException e1) {
 				System.out.println("Something was wrong");
-				//e1.printStackTrace();
 			}
 			System.exit(0);
-		}
-		// System.out.println("Records created successfully");
-
-	}
-
-	// selects all fixtures for a given season from the database
-	// without cl and wc and from 11 matchday up
-	public static ArrayList<ExtendedFixture> select(int season) {
-		ArrayList<ExtendedFixture> results = new ArrayList<>();
-
-		Connection c = null;
-		Statement stmt = null;
-		try {
-			Class.forName("org.sqlite.JDBC");
-			c = DriverManager.getConnection("jdbc:sqlite:test.db");
-			c.setAutoCommit(false);
-			// System.out.println("Opened database successfully");
-
-			stmt = c.createStatement();
-			ResultSet rs = stmt.executeQuery(
-					"select * from results" + season + " where matchday > 10 and competition not in ('CL' ,'WC');");
-			while (rs.next()) {
-				String date = rs.getString("date");
-				String homeTeamName = rs.getString("hometeamname");
-				String awayTeamName = rs.getString("awayteamname");
-				int homeGoals = rs.getInt("homegoals");
-				int awayGoals = rs.getInt("awaygoals");
-				String competition = rs.getString("competition");
-				int matchday = rs.getInt("matchday");
-				ExtendedFixture ef = new ExtendedFixture(format.parse(date), homeTeamName, awayTeamName,
-						new Result(homeGoals, awayGoals), competition).withMatchday(matchday);
-				results.add(ef);
-			}
-			rs.close();
-			stmt.close();
-			c.close();
-		} catch (Exception e) {
-			System.err.println("Something was wrong");
-			System.exit(0);
-		}
-		// System.out.println("Operation done successfully");
-
-		return results;
-	}
-
-	public static ArrayList<ExtendedFixture> selectLastAll(String team, int count, int season, int matchday,
-			String competition) {
-		ArrayList<ExtendedFixture> results = new ArrayList<>();
-
-		Connection c = null;
-		Statement stmt = null;
-		try {
-			Class.forName("org.sqlite.JDBC");
-			c = DriverManager.getConnection("jdbc:sqlite:test.db");
-			c.setAutoCommit(false);
-			// System.out.println("Opened database successfully");
-
-			stmt = c.createStatement();
-			ResultSet rs = stmt.executeQuery("select * from results" + season + " where matchday < " + matchday
-					+ " and competition='" + competition + "' and ((hometeamname = '" + team + "') or (awayteamname = '"
-					+ team + "')) order by matchday" + " desc limit " + count + ";");
-			while (rs.next()) {
-				String date = rs.getString("date");
-				String homeTeamName = rs.getString("hometeamname");
-				String awayTeamName = rs.getString("awayteamname");
-				int homeGoals = rs.getInt("homegoals");
-				int awayGoals = rs.getInt("awaygoals");
-				String competit = rs.getString("competition");
-				int matchd = rs.getInt("matchday");
-				ExtendedFixture ef = new ExtendedFixture(format.parse(date), homeTeamName, awayTeamName,
-						new Result(homeGoals, awayGoals), competit).withMatchday(matchd);
-				results.add(ef);
-			}
-			rs.close();
-			stmt.close();
-			c.close();
-		} catch (Exception e) {
-			System.err.println("Something was wrong");
-			System.exit(0);
-		}
-		// System.out.println("Operation done successfully");
-
-		return results;
-	}
-
-	public static ArrayList<ExtendedFixture> selectLastHome(String team, int count, int season, int matchday,
-			String competition) {
-		ArrayList<ExtendedFixture> results = new ArrayList<>();
-
-		Connection c = null;
-		Statement stmt = null;
-		try {
-			Class.forName("org.sqlite.JDBC");
-			c = DriverManager.getConnection("jdbc:sqlite:test.db");
-			c.setAutoCommit(false);
-			// System.out.println("Opened database successfully");
-
-			stmt = c.createStatement();
-			ResultSet rs = stmt.executeQuery("select * from results" + season + " where matchday < " + matchday
-					+ " and competition='" + competition + "' and (hometeamname = '" + team + "')  order by matchday"
-					+ " desc limit " + count + ";");
-			while (rs.next()) {
-				String date = rs.getString("date");
-				String homeTeamName = rs.getString("hometeamname");
-				String awayTeamName = rs.getString("awayteamname");
-				int homeGoals = rs.getInt("homegoals");
-				int awayGoals = rs.getInt("awaygoals");
-				String competit = rs.getString("competition");
-				int matchd = rs.getInt("matchday");
-				ExtendedFixture ef = new ExtendedFixture(format.parse(date), homeTeamName, awayTeamName,
-						new Result(homeGoals, awayGoals), competit).withMatchday(matchd);
-				results.add(ef);
-			}
-			rs.close();
-			stmt.close();
-			c.close();
-		} catch (Exception e) {
-			System.err.println("Something was wrong");
-			System.exit(0);
-		}
-		// System.out.println("Operation done successfully");
-
-		return results;
-	}
-
-	public static boolean checkExistense(String hometeam, String awayteam, String date, int season) {
-		boolean flag = false;
-
-		Connection c = null;
-		Statement stmt = null;
-		try {
-			Class.forName("org.sqlite.JDBC");
-			c = DriverManager.getConnection("jdbc:sqlite:test.db");
-			c.setAutoCommit(false);
-			stmt = c.createStatement();
-
-			ResultSet rs = stmt
-					.executeQuery("select * from results" + season + " where hometeamname = " + addQuotes(hometeam)
-							+ " and awayteamname = " + addQuotes(awayteam) + " and date = " + addQuotes(date));
-			flag = rs.next();
-
-			rs.close();
-			stmt.close();
-			c.close();
-		} catch (Exception e) {
-			System.err.println("Something was wrong");
-			System.exit(0);
-		}
-
-		return flag;
-	}
-
-	public static ArrayList<String> getLeagues(int season) {
-		ArrayList<String> leagues = new ArrayList<>();
-
-		Connection c = null;
-		Statement stmt = null;
-		try {
-			Class.forName("org.sqlite.JDBC");
-			c = DriverManager.getConnection("jdbc:sqlite:test.db");
-			c.setAutoCommit(false);
-			stmt = c.createStatement();
-
-			ResultSet rs = stmt.executeQuery("select distinct competition from results" + season);
-			while (rs.next()) {
-				leagues.add(rs.getString("competition"));
-			}
-
-			rs.close();
-			stmt.close();
-			c.close();
-		} catch (Exception e) {
-			System.err.println("Something was wrong");
-			System.exit(0);
-		}
-		return leagues;
-	}
-
-	public static ArrayList<ExtendedFixture> selectLastAway(String team, int count, int season, int matchday,
-			String competition) {
-		ArrayList<ExtendedFixture> results = new ArrayList<>();
-
-		Connection c = null;
-		Statement stmt = null;
-		try {
-			Class.forName("org.sqlite.JDBC");
-			c = DriverManager.getConnection("jdbc:sqlite:test.db");
-			c.setAutoCommit(false);
-			// System.out.println("Opened database successfully");
-
-			stmt = c.createStatement();
-			ResultSet rs = stmt.executeQuery("select * from results" + season + " where matchday < " + matchday
-					+ " and competition='" + competition + "' and  (awayteamname = '" + team + "') order by matchday"
-					+ " desc limit " + count + ";");
-			while (rs.next()) {
-				String date = rs.getString("date");
-				String homeTeamName = rs.getString("hometeamname");
-				String awayTeamName = rs.getString("awayteamname");
-				int homeGoals = rs.getInt("homegoals");
-				int awayGoals = rs.getInt("awaygoals");
-				String competit = rs.getString("competition");
-				int matchd = rs.getInt("matchday");
-				ExtendedFixture ef = new ExtendedFixture(format.parse(date), homeTeamName, awayTeamName,
-						new Result(homeGoals, awayGoals), competit).withMatchday(matchd).withStatus("FINISHED");
-				results.add(ef);
-			}
-			rs.close();
-			stmt.close();
-			c.close();
-		} catch (Exception e) {
-			System.err.println("Something was wrong");
-			System.exit(0);
-		}
-		// System.out.println("Operation done successfully");
-
-		return results;
-	}
-
-	public static float selectAvgLeagueHome(String competition, int season, int matchday) {
-		float average = -1.0f;
-		Connection c = null;
-		Statement stmt = null;
-		try {
-			Class.forName("org.sqlite.JDBC");
-			c = DriverManager.getConnection("jdbc:sqlite:test.db");
-			c.setAutoCommit(false);
-
-			stmt = c.createStatement();
-			ResultSet rs = stmt.executeQuery("select avg(homegoals) from results" + season + " where competition="
-					+ addQuotes(competition) + " and matchday<" + matchday);
-			average = rs.getFloat("avg(homegoals)");
-
-			rs.close();
-			stmt.close();
-			c.close();
-		} catch (Exception e) {
-			System.err.println("Something was wrong");
-			System.exit(0);
-		}
-		return average;
-	}
-
-	public static float selectAvgLeagueAway(String competition, int season, int matchday) {
-		float average = -1.0f;
-		Connection c = null;
-		Statement stmt = null;
-		try {
-			Class.forName("org.sqlite.JDBC");
-			c = DriverManager.getConnection("jdbc:sqlite:test.db");
-			c.setAutoCommit(false);
-
-			stmt = c.createStatement();
-			ResultSet rs = stmt.executeQuery("select avg(awaygoals) from results" + season + " where competition="
-					+ addQuotes(competition) + " and matchday<" + matchday);
-			average = rs.getFloat("avg(awaygoals)");
-
-			rs.close();
-			stmt.close();
-			c.close();
-		} catch (Exception e) {
-			System.err.println("Something was wrong");
-			System.exit(0);
-		}
-		return average;
-	}
-
-	public static float selectAvgHomeTeamFor(String competition, String team, int season, int matchday) {
-		float average = -1.0f;
-		Connection c = null;
-		Statement stmt = null;
-		try {
-			Class.forName("org.sqlite.JDBC");
-			c = DriverManager.getConnection("jdbc:sqlite:test.db");
-			c.setAutoCommit(false);
-
-			stmt = c.createStatement();
-			ResultSet rs = stmt.executeQuery("select avg(homegoals) from results" + season + " where competition="
-					+ addQuotes(competition) + " and matchday<" + matchday + " and hometeamname=" + addQuotes(team));
-			average = rs.getFloat("avg(homegoals)");
-
-			rs.close();
-			stmt.close();
-			c.close();
-		} catch (Exception e) {
-			System.err.println("Something was wrong");
-			System.exit(0);
-		}
-		return average;
-	}
-
-	public static float selectAvgHomeTeamAgainst(String competition, String team, int season, int matchday) {
-		float average = -1.0f;
-		Connection c = null;
-		Statement stmt = null;
-		try {
-			Class.forName("org.sqlite.JDBC");
-			c = DriverManager.getConnection("jdbc:sqlite:test.db");
-			c.setAutoCommit(false);
-
-			stmt = c.createStatement();
-			ResultSet rs = stmt.executeQuery("select avg(awaygoals) from results" + season + " where competition="
-					+ addQuotes(competition) + " and matchday<" + matchday + " and hometeamname=" + addQuotes(team));
-			average = rs.getFloat("avg(awaygoals)");
-
-			rs.close();
-			stmt.close();
-			c.close();
-		} catch (Exception e) {
-			System.err.println("Something was wrong");
-			System.exit(0);
-		}
-		return average;
-	}
-
-	public static float selectAvgAwayTeamFor(String competition, String team, int season, int matchday) {
-		float average = -1.0f;
-		Connection c = null;
-		Statement stmt = null;
-		try {
-			Class.forName("org.sqlite.JDBC");
-			c = DriverManager.getConnection("jdbc:sqlite:test.db");
-			c.setAutoCommit(false);
-
-			stmt = c.createStatement();
-			ResultSet rs = stmt.executeQuery("select avg(awaygoals) from results" + season + " where competition="
-					+ addQuotes(competition) + " and matchday<" + matchday + " and awayteamname=" + addQuotes(team));
-			average = rs.getFloat("avg(awaygoals)");
-
-			rs.close();
-			stmt.close();
-			c.close();
-		} catch (Exception e) {
-			System.err.println("Something was wrong");
-			System.exit(0);
-		}
-		return average;
-	}
-
-	public static float selectAvgAwayTeamAgainst(String competition, String team, int season, int matchday) {
-		float average = -1.0f;
-		Connection c = null;
-		Statement stmt = null;
-		try {
-			Class.forName("org.sqlite.JDBC");
-			c = DriverManager.getConnection("jdbc:sqlite:test.db");
-			c.setAutoCommit(false);
-
-			stmt = c.createStatement();
-			ResultSet rs = stmt.executeQuery("select avg(homegoals) from results" + season + " where competition="
-					+ addQuotes(competition) + " and matchday<" + matchday + " and awayteamname=" + addQuotes(team));
-			average = rs.getFloat("avg(homegoals)");
-
-			rs.close();
-			stmt.close();
-			c.close();
-		} catch (Exception e) {
-			System.err.println("Something was wrong");
-			System.exit(0);
-		}
-		return average;
-	}
-	
-	private static JSONObject createJSONObject(String address){
-		return new JSONObject(Utils.query(address));
-	}
-
-	// update database with all results up to date for a season 30 days back
-	public static void update(int season) throws ParseException {
-		try {
-			JSONArray arr = new JSONArray(
-					Utils.query("http://api.football-data.org/alpha/soccerseasons/?season=" + season));
-			for (int i = 0; i < arr.length(); i++) {
-				String address = arr.getJSONObject(i).getJSONObject("_links").getJSONObject("fixtures")
-						.getString("href") + "/?timeFrame=p30";
-				String league = arr.getJSONObject(i).getString("league");
-				JSONObject obj = createJSONObject(address);
-				obj.getJSONArray("fixtures");
-				JSONArray jsonFixtures = obj.getJSONArray("fixtures");
-
-				ArrayList<ExtendedFixture> fixtures = Utils.createFixtureList(jsonFixtures);
-				for (ExtendedFixture f : fixtures) {
-					if (f.status.equals("FINISHED")
-							&& !SQLiteJDBC.checkExistense(f.homeTeam, f.awayTeam, format.format(f.date), season)) {
-						SQLiteJDBC.insert(f, league, "RESULTS" + season);
-					}
-				}
-			}
-		} catch (IOException | JSONException e) {
-			System.out.println("Something was wrong");
-			//e.printStackTrace();
 		}
 	}
 
@@ -520,7 +124,6 @@ public class SQLiteJDBC {
 			}
 		} catch (IOException | JSONException e) {
 			System.out.println("Something was wrong");
-			//e.printStackTrace();
 		}
 	}
 
@@ -545,7 +148,6 @@ public class SQLiteJDBC {
 				stmt.executeUpdate(sql);
 			} catch (SQLException e) {
 				System.out.println("tuka");
-
 			}
 
 			stmt.close();
@@ -557,7 +159,6 @@ public class SQLiteJDBC {
 				c.close();
 			} catch (SQLException e1) {
 				System.out.println("Something was wrong");
-				//e1.printStackTrace();
 			}
 			System.exit(0);
 		}
@@ -571,7 +172,6 @@ public class SQLiteJDBC {
 			Class.forName("org.sqlite.JDBC");
 			c = DriverManager.getConnection("jdbc:sqlite:test.db");
 			c.setAutoCommit(false);
-			// System.out.println("Opened database successfully");
 
 			stmt = c.createStatement();
 			String sql = "INSERT INTO " + tableName + " (DATE,HOMETEAMNAME,AWAYTEAMNAME,YEAR,COMPETITION,SCORE)"
@@ -593,7 +193,6 @@ public class SQLiteJDBC {
 				c.close();
 			} catch (SQLException e1) {
 				System.out.println("Something was wrong");
-				//e1.printStackTrace();
 			}
 			System.exit(0);
 		}
@@ -711,6 +310,29 @@ public class SQLiteJDBC {
 		return result;
 	}
 
+	private static void controlTableName(String tableName, ExtendedFixture f, HSSFSheet sheet, Statement stmt, int year)
+	{
+		float score = Float.NaN;
+		if (tableName.equals("BASICS")) {
+			score = XlSUtils.basic2(f, sheet, 0.6f, 0.3f, 0.1f);
+		} else if (tableName.equals("POISSON")) {
+			score = XlSUtils.poisson(f, sheet);
+		} else if (tableName.equals("WEIGHTED")) {
+			score = XlSUtils.poissonWeighted(f, sheet);
+		} else if (tableName.equals("HALFTIME1")) {
+			score = XlSUtils.halfTimeOnly(f, sheet, 1);
+		} else if (tableName.equals("HALFTIME2")) {
+			score = XlSUtils.halfTimeOnly(f, sheet, 2);
+		} else if (tableName.equals("SHOTS")) {
+			score = XlSUtils.shots(f, sheet);
+		}
+		String sql = "INSERT INTO " + tableName + " (DATE,HOMETEAMNAME,AWAYTEAMNAME,YEAR,COMPETITION,SCORE)"
+				+ "VALUES (" + addQuotes(format.format(f.date)) + "," + addQuotes(f.homeTeam) + ","
+				+ addQuotes(f.awayTeam) + "," + year + "," + addQuotes(f.competition) + "," + score + " );";
+		if (!Float.isNaN(score))
+			stmt.executeUpdate(sql);
+	}
+	
 	public static void insertBasic(HSSFSheet sheet, ArrayList<ExtendedFixture> all, int year, String tableName) {
 		Connection c = null;
 		Statement stmt = null;
@@ -722,32 +344,11 @@ public class SQLiteJDBC {
 			stmt = c.createStatement();
 			try {
 				for (ExtendedFixture f : all) {
-					float score = Float.NaN;
-					if (tableName.equals("BASICS")) {
-						score = XlSUtils.basic2(f, sheet, 0.6f, 0.3f, 0.1f);
-					} else if (tableName.equals("POISSON")) {
-						score = XlSUtils.poisson(f, sheet);
-					} else if (tableName.equals("WEIGHTED")) {
-						score = XlSUtils.poissonWeighted(f, sheet);
-					} else if (tableName.equals("HALFTIME1")) {
-						score = XlSUtils.halfTimeOnly(f, sheet, 1);
-					} else if (tableName.equals("HALFTIME2")) {
-						score = XlSUtils.halfTimeOnly(f, sheet, 2);
-					} else if (tableName.equals("SHOTS")) {
-						score = XlSUtils.shots(f, sheet);
-					}
-	
-					String sql = "INSERT INTO " + tableName + " (DATE,HOMETEAMNAME,AWAYTEAMNAME,YEAR,COMPETITION,SCORE)"
-							+ "VALUES (" + addQuotes(format.format(f.date)) + "," + addQuotes(f.homeTeam) + ","
-							+ addQuotes(f.awayTeam) + "," + year + "," + addQuotes(f.competition) + "," + score + " );";
-					
-					if (!Float.isNaN(score))
-						stmt.executeUpdate(sql);
+					controlTableName(tableName, f, sheet, stmt, year);
 				}
 			} catch (SQLException e) {
 				System.out.println("tuka");
 			}
-
 			stmt.close();
 			c.commit();
 			c.close();
@@ -757,7 +358,6 @@ public class SQLiteJDBC {
 				c.close();
 			} catch (SQLException e1) {
 				System.out.println("Something was wrong");
-				//e1.printStackTrace();
 			}
 			System.exit(0);
 		}
@@ -792,7 +392,6 @@ public class SQLiteJDBC {
 				}
 			} catch (SQLException e) {
 					System.out.println("Something was wrong");
-					//e.printStackTrace();
 					System.out.println("tuka");
 				}
 
@@ -805,7 +404,6 @@ public class SQLiteJDBC {
 				c.close();
 			} catch (SQLException e1) {
 				System.out.println("Something was wrong");
-				//e1.printStackTrace();
 			}
 			System.exit(0);
 		}
@@ -833,16 +431,10 @@ public class SQLiteJDBC {
 							+ "," + (f.substitute ? 1 : 0) + "," + f.goals + "," + f.assists + " );";
 					
 					stmt.executeUpdate(sql);
-					// success++;
 				}
 			} catch (SQLException e) {
 				fails++;
 				System.out.println("Something was wrong");
-				//e.printStackTrace();
-				// System.out.println(success + " succ " + fails + "
-				// failed");
-				// System.out.println(sql);
-				// break;
 			}
 
 			stmt.close();
@@ -854,7 +446,6 @@ public class SQLiteJDBC {
 				c.close();
 			} catch (SQLException e1) {
 				System.out.println("Something was wrong");
-				//e1.printStackTrace();
 			}
 			System.exit(0);
 		}
@@ -903,7 +494,6 @@ public class SQLiteJDBC {
 			System.err.println("Something was wrong");
 			System.exit(0);
 		}
-
 		return result;
 	}
 	
@@ -949,14 +539,12 @@ public class SQLiteJDBC {
 				result.add(f);
 			}
 			rs.close();
-
 			stmt.close();
 			c.close();
 		} catch (Exception e) {
 			System.err.println("Something was wrong");
 			System.exit(0);
 		}
-
 		return result;
 	}
 
@@ -1084,7 +672,6 @@ public class SQLiteJDBC {
 				}
 			} catch (SQLException e) {
 				System.out.println("Something was wrong");
-				//e.printStackTrace();
 				System.out.println("tuka");
 			}
 
@@ -1097,7 +684,6 @@ public class SQLiteJDBC {
 				c.close();
 			} catch (SQLException e1) {
 				System.out.println("Something was wrong");
-				//e1.printStackTrace();
 			}
 			System.exit(0);
 		}
@@ -1132,7 +718,6 @@ public class SQLiteJDBC {
 				}
 			} catch (SQLException e) {
 				System.out.println("Something was wrong");
-				//e.printStackTrace();
 				System.out.println("tuka");
 			}
 
@@ -1145,10 +730,13 @@ public class SQLiteJDBC {
 				c.close();
 			} catch (SQLException e1) {
 				System.out.println("Something was wrong");
-				//e1.printStackTrace();
 			}
 			System.exit(0);
 		}
+	}
+	
+	private static JSONObject createJSONObject(String address){
+		return new JSONObject(Utils.query(address));
 	}
 
 }

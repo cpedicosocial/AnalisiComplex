@@ -68,7 +68,7 @@ public class PlayerFixture {
 		return result;
 	}
 
-	private static void controlFixture()
+	private static boolean controlFixture(PlayerFixture other)
 	{
 		if (fixture == null && other.fixture != null)
 			return false;
@@ -76,7 +76,7 @@ public class PlayerFixture {
 			return false;
 	}
 	
-	private static void controlName()
+	private static boolean controlName(PlayerFixture other)
 	{
 		if (name == null && other.name != null)
 			return false;
@@ -84,7 +84,7 @@ public class PlayerFixture {
 			return false;
 	}
 	
-	private static void controlTeam()
+	private static boolean controlTeam(PlayerFixture other)
 	{
 		if (team == null && other.team != null)
 			return false;
@@ -92,7 +92,6 @@ public class PlayerFixture {
 			return false;
 
 	}
-	
 	
 	@Override
 	public boolean equals(Object obj) {
@@ -103,24 +102,9 @@ public class PlayerFixture {
 		if (!(obj instanceof PlayerFixture))
 			return false;
 		PlayerFixture other = (PlayerFixture) obj;
-		controlFixture();
-		controlName();
-		controlTeam();
-		/**
-		if (fixture == null && other.fixture != null)
-			return false;
-		if (fixture != null && !fixture.equals(other.fixture))
-			return false;
-		if (name == null && other.name != null)
-			return false;
-		if (name != null && !name.equals(other.name))
-			return false;
-		if (team == null && other.team != null)
-			return false;
-		if (team != null && !team.equals(other.team))
-			return false;
-		*/
-		
+		controlFixture(other);
+		controlName(other);
+		controlTeam(other);
 		return true;
 	}
 	

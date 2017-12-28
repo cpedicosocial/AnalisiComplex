@@ -2,7 +2,6 @@ package entries;
 
 import main.ExtendedFixture;
 import results.Results;
-import utils.Utils;
 
 /**
  * PJDCC - Summary for class responsabilities.
@@ -40,7 +39,7 @@ public class AsianEntry {
 				+ coeff + " " + success() + " exp " + Results.format(expectancy) + "\n";
 	}
 
-	private static void controlPrediction()
+	private static String controlPrediction(float diff)
 	{
 		if (diff >= 0.5f){
 			return "W";
@@ -53,11 +52,11 @@ public class AsianEntry {
 		} 
 	}
 	
-	private static void controlNotPrediction()
+	private static String controlNotPrediction(float diff)
 	{
 		if (diff >= 0.5f){
 			return "L";
-	    } else if (!Float.compare(diff, 0.25f)==0) {
+	    } else if (Float.compare(diff, 0.25f)!=0) {
 			return "HL";
 		} else if (Float.compare(diff, 0f)==0) {
 			return "D";
@@ -73,10 +72,10 @@ public class AsianEntry {
 		int result = fixture.result.goalsHomeTeam - fixture.result.goalsAwayTeam;
 		float diff = result + line;
 		if(prediction){
-			controlPrediction();		
+			return controlPrediction(diff);		
 		}
 		else{
-			controlNotPrediction();
+			return controlNotPrediction(diff);
 		}
 	}
 

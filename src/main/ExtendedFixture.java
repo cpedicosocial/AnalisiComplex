@@ -213,7 +213,7 @@ public class ExtendedFixture implements Comparable<ExtendedFixture> {
 		return result;
 	}
 
-	private static void controlAwayTeam()
+	private static boolean controlAwayTeam(ExtendedFixture other)
 	{
 		if (awayTeam == null && other.awayTeam != null)
 			return false;
@@ -221,7 +221,7 @@ public class ExtendedFixture implements Comparable<ExtendedFixture> {
 			return false;
 	}
 	
-	private static void controlDate()
+	private static boolean controlDate(ExtendedFixture other)
 	{
 		if (date == null && other.date != null)
 			return false;
@@ -229,7 +229,7 @@ public class ExtendedFixture implements Comparable<ExtendedFixture> {
 			return false;
 	}
 	
-	private static void controlHomeTeam()
+	private static boolean controlHomeTeam(ExtendedFixture other)
 	{
 		if (homeTeam == null && other.homeTeam != null)
 			return false;
@@ -245,27 +245,10 @@ public class ExtendedFixture implements Comparable<ExtendedFixture> {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		
 		ExtendedFixture other = (ExtendedFixture) obj;
-		
-		controlAwayTeam();
-		controlDate();
-		controlHomeTeam();
-		
-		/*
-		if (awayTeam == null && other.awayTeam != null)
-			return false;
-		if (awayTeam != null && !awayTeam.equals(other.awayTeam))
-			return false;
-		if (date == null && other.date != null)
-			return false;
-		if (date != null && !date.equals(other.date))
-			return false;
-		if (homeTeam == null && other.homeTeam != null)
-			return false;
-		if (homeTeam != null && !homeTeam.equals(other.homeTeam))
-			return false;
-		*/
+		controlAwayTeam(other);
+		controlDate(other);
+		controlHomeTeam(other);
 		return true;
 	}
 

@@ -22,7 +22,7 @@ public class FullEntry extends FinalEntry {
 		this.line = line;
 	}
 	
-	private static void predictionGreater()
+	private static String predictionGreater(float diff)
 	{
 		if (diff >= 0.5f){
 			return "W";
@@ -37,7 +37,7 @@ public class FullEntry extends FinalEntry {
 		}
 	}
 
-	private static void predictionSmaller()
+	private static String predictionSmaller(float diff)
 	{
 		if (diff >= 0.5f){
 			return "L";
@@ -60,34 +60,11 @@ public class FullEntry extends FinalEntry {
 		}
 		
 		if(prediction>=upper){
-			predictionGreater();
+			predictionGreater(diff);
 		}
 		else{
-			predictionSmaller();
+			predictionSmaller(diff);
 		}		
-		/*
-		if (prediction >= upper && diff >= 0.5f){
-			return "W";
-		} else if (prediction >= upper && Float.compare(diff, 0.25f)==0) {
-			return "HW";
-		} else if (prediction >= upper && Float.compare(diff, 0f)==0) {
-			return "D";
-		} else if (prediction >= upper && Float.compare(diff, -0.25f)==0) {
-			return "HL";
-		} else {
-			return "L";
-		}
-		if (prediction < upper && diff >= 0.5f){
-			return "L";
-		} else if (prediction < upper && Float.compare(diff, 0.25f)==0) {
-			return "HL";
-		} else if (prediction < upper && Float.compare(diff, 0f)==0) {
-			return "D";
-		} else if (prediction < upper && Float.compare(diff, -0.25f)==0) {
-			return "HW";
-		} else {
-			return "W";
-		}*/
 	}
 
 

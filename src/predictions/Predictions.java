@@ -5,12 +5,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -92,29 +89,76 @@ public class Predictions {
 		 Runtime.getRuntime().exec("taskkill /F /IM chromedriver.exe /T");
 	}
 
+	private static void controlEquilibriumGreater(ArrayList<FinalEntry> equilibriumsData, boolean allUnders)
+	{
+		if (Utils.getProfit(Utils.allUnders(Utils.onlyFixtures(equilibriumsData))) > 0f) {
+			allUnders = true;
+			Utils.printStats(Utils.allUnders(Utils.onlyFixtures(equilibriumsData)), "Equilibriums as unders");
+		}
+	}
+	
+	private static void controlEquilibriumSmaller(ArrayList<FinalEntry> equilibriumsData, boolean allOvers)
+	{
+		if (Utils.getProfit(Utils.allUnders(Utils.onlyFixtures(equilibriumsData))) <= 0f &&
+				Utils.getProfit(Utils.allOvers(Utils.onlyFixtures(equilibriumsData))) > 0f) {
+				allOvers = true;
+				Utils.printStats(Utils.allOvers(Utils.onlyFixtures(equilibriumsData)), "Equilibriums as overs");
+			} else {
+				System.out.println("No value in equilibriums");
+		}
+	}
+	
+	private static void controlAllUnders(ArrayList<FinalEntry> equilibriumsPending, boolean allOvers, boolean allUnders, ArrayList<FinalEntry> result)
+	{
+		if (allUnders) {
+			System.out.println(equilibriumsPending);
+			result.addAll(equilibriumsPending);
+		} else if (allOvers) {
+			equilibriumsPending = XlSUtils.restrict(equilibriumsPending,
+					Settings.shots(i.getKey()).withTHandBounds(0.45f));
+			System.out.println(equilibriumsPending);
+			result.addAll(equilibriumsPending);
+		}
+	}
+	
+	private static void controlOnlyToday(OnlyTodayMatches onlyToday, ArrayList<FinalEntry> pending, int month, int year)
+	{
+		if (onlyToday.equals(OnlyTodayMatches.TRUE)) {
+			pending = Utils.gamesForDay(pending, LocalDate.of(2017, month, day));
+		}
+	}
+	
+	private static void controlFile(FileInputStream file, DataType type, String base, int year)
+	{
+		if (type.equals(DataType.ALLEURODATA))
+			file = new FileInputStream(new File(base + "\\data\\all-euro-data-" + year + "-" + (year + 1) + ".xls"));
+		else if (type.equals(DataType.ODDSPORTAL))
+			file = new FileInputStream(new File(base + "\\data\\odds" + year + ".xls"));
+	}
+	
+	private static void controlFileFinally(FileInputStream file)
+	{
+		if (file != null) {
+			try {
+				file.close (); // OK
+			} catch (java.io.IOException e3) {
+				System.out.println("I/O Exception");
+	       }
+		}
+	}
+	
 	public static ArrayList<FinalEntry> predictions(int year, DataType type, UpdateType automatic,
 			OnlyTodayMatches onlyToday, int day, int month)
 					throws InterruptedException, ExecutionException, IOException {
 		try {
 			String base = new File("").getAbsolutePath();
-	
 			FileInputStream file = null;
-			if (type.equals(DataType.ALLEURODATA))
-				file = new FileInputStream(new File(base + "\\data\\all-euro-data-" + year + "-" + (year + 1) + ".xls"));
-			else if (type.equals(DataType.ODDSPORTAL))
-				file = new FileInputStream(new File(base + "\\data\\odds" + year + ".xls"));
-	
+			controlFile(file, type, base, year);
 			HSSFWorkbook workbook = new HSSFWorkbook(file);
 		} catch (Exception e) {
 			System.out.println("Something was wrong");
 		} finally {
-			if (file != null) {
-				try {
-					file.close (); // OK
-				} catch (java.io.IOException e3) {
-					System.out.println("I/O Exception");
-               }
-			}
+			controlFileFinally(file);
 		}
 		Iterator<Sheet> sheet = workbook.sheetIterator();
 		ArrayList<FinalEntry> all = new ArrayList<>();
@@ -161,12 +205,10 @@ public class Predictions {
 			ArrayList<FinalEntry> data = Utils.notPendingFinals(i.getValue());
 			ArrayList<FinalEntry> equilibriumsData = Utils.equilibriums(data);
 			ArrayList<FinalEntry> dataProper = Utils.noequilibriums(data);
-
 			ArrayList<FinalEntry> pending = Utils.pendingFinals(i.getValue());
-			if (onlyToday.equals(OnlyTodayMatches.TRUE)) {
-				pending = Utils.gamesForDay(pending, LocalDate.of(2017, month, day));
-			}
-
+			
+			controlOnlyToday(onlyToday, pending, month, year);
+			
 			if (pending.isEmpty())
 				continue;
 
@@ -176,27 +218,10 @@ public class Predictions {
 
 			boolean allUnders = false;
 			boolean allOvers = false;
-			if (Utils.getProfit(Utils.allUnders(Utils.onlyFixtures(equilibriumsData))) > 0f) {
-				allUnders = true;
-				Utils.printStats(Utils.allUnders(Utils.onlyFixtures(equilibriumsData)), "Equilibriums as unders");
-			}
-			if (Utils.getProfit(Utils.allUnders(Utils.onlyFixtures(equilibriumsData))) <= 0f &&
-				Utils.getProfit(Utils.allOvers(Utils.onlyFixtures(equilibriumsData))) > 0f) {
-				allOvers = true;
-				Utils.printStats(Utils.allOvers(Utils.onlyFixtures(equilibriumsData)), "Equilibriums as overs");
-			} else {
-				System.out.println("No value in equilibriums");
-			}
-
-			if (allUnders) {
-				System.out.println(equilibriumsPending);
-				result.addAll(equilibriumsPending);
-			} else if (allOvers) {
-				equilibriumsPending = XlSUtils.restrict(equilibriumsPending,
-						Settings.shots(i.getKey()).withTHandBounds(0.45f));
-				System.out.println(equilibriumsPending);
-				result.addAll(equilibriumsPending);
-			}
+			
+			controlEquilibriumGreater(equilibriumsData,allUnders);
+			controlEquilibriumSmaller(equilibriumsData,allOvers);
+			controlAllUnders(equilibriumsPending, allOvers, result);
 
 			Utils.printStats(dataProper, "all");
 			Utils.printStats(Utils.onlyUnders(dataProper), "unders");

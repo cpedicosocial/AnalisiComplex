@@ -1,6 +1,5 @@
 package utils;
 
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -21,6 +20,25 @@ import xls.XlSUtils;
 
 public class Classifiers {
 
+	private static float controlExpectedGreater(float expected, float avgShotsUnder, float avgShotsOver, float dist)
+	{
+		if (expected >= avgShotsOver && expected > avgShotsUnder) {
+			float score = 0.5f + 0.5f * (expected - avgShotsOver) / dist;
+			return (score >= 0 && score <= 1f) ? score : 1f;
+		} 
+	}
+	
+	private static float controlExpectedSmaller(float expected, float avgShotsUnder, float avgShotsOver, float dist)
+	{
+		if (expected <= avgShotsUnder && expected < avgShotsOver) {
+			float score = 0.5f - 0.5f * (-expected + avgShotsUnder) / dist;
+			return (score >= 0 && score <= 1f) ? score : 0f;
+		} 
+		else {
+			return 0.5f;
+		}
+	}
+	
 	public static float shots(ExtendedFixture f, ArrayList<ExtendedFixture> all) {
 		// The shots data from soccerway(opta) does not add the goals as shots,
 		// must be added for more accurate predictions and equivalancy with
@@ -52,6 +70,10 @@ public class Classifiers {
 		if (avgShotsUnder > avgShotsOver) {
 			return 0.5f;
 		}
+		//e il return?
+		controlExpectedGreater(expected, avgShotsUnder, avgShotsOver, dist);
+		controlExpectedSmaller(expected, avgShotsUnder, avgShotsOver, dist);
+		/**
 		if (expected >= avgShotsOver && expected > avgShotsUnder) {
 			float score = 0.5f + 0.5f * (expected - avgShotsOver) / dist;
 			return (score >= 0 && score <= 1f) ? score : 1f;
@@ -62,7 +84,7 @@ public class Classifiers {
 		} 
 		else {
 			return 0.5f;
-		}
+		}*/
 	}
 
 	/**
